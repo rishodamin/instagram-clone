@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "643057228024",
+    "project_id": "risho-instagram-clone",
+    "storage_bucket": "risho-instagram-clone.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643057228024:android:1601d5444cece5e0e3430d",
+        "android_client_info": {
+          "package_name": "com.example.instagram_clone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0hc4UxuVJWDEBZPv1p4IinS26kHyi_lU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
