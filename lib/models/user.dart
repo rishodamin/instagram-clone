@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:instagram_clone/utils/global_variables.dart';
 
 class User {
   final String email;
