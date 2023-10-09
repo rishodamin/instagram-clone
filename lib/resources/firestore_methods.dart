@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,6 +37,52 @@ class FirestoreMethods {
       return "success";
     } catch (e) {
       return e.toString();
+    }
+  }
+
+  Future<void> likePost(String postId, String uid, List likes,
+      {bool fromHeart = false}) async {
+    try {
+      if (likes.contains(uid)) {
+        if (fromHeart) {
+          _firestore.collection('posts').doc(postId).update({
+            'likes': FieldValue.arrayRemove([uid])
+          });
+        }
+      } else {
+        _firestore.collection('posts').doc(postId).update({
+          'likes': FieldValue.arrayUnion([uid])
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> postComment(String postId, String text, String uid, String name,
+      String? profilePic) async {
+    try {
+      if (text.isNotEmpty) {
+        String commentId = const Uuid().v1();
+        _firestore
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .set({
+          'profilePic': profilePic,
+          'name': name,
+          'uid': uid,
+          'text': text,
+          'commentId': commentId,
+          'datePublished': DateTime.now(),
+          'likes': 0,
+        });
+      } else {
+        print('text is empty');
+      }
+    } catch (e) {
+      print(e.toString());
     }
   }
 }

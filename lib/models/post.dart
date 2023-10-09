@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Post {
   final String caption;
   final String uid;
@@ -31,18 +29,18 @@ class Post {
         'likes': likes,
       };
 
-  static Post fromSnap(DocumentSnapshot snap) {
-    var snapshot = snap.data() as Map<String, dynamic>;
+  // static Post fromSnap(DocumentSnapshot snap) {
+  //   var snapshot = snap.data() as Map<String, dynamic>;
 
-    return Post(
-      caption: snapshot["caption"],
-      uid: snapshot["uid"],
-      postId: snapshot["postId"],
-      username: snapshot["username"],
-      datePublished: snapshot["datePublished"],
-      profImage: snapshot["profImage"],
-      likes: snapshot["likes"],
-      postUrl: snapshot["postUrl"],
-    );
-  }
+  //   return Post(
+  //     caption: snapshot["caption"],
+  //     uid: snapshot["uid"],
+  //     postId: snapshot["postId"],
+  //     username: snapshot["username"],
+  //     datePublished: snapshot["datePublished"],
+  //     profImage: snapshot["profImage"],
+  //     likes: snapshot["likes"],
+  //     postUrl: snapshot["postUrl"],
+  //   );
+  // }
 }
