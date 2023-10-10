@@ -40,6 +40,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     setState(() {
       _isLoading = false;
       _file = null;
+      _captionController.text = '';
     });
     if (res == "success") {
       showSnackBar("Posted Successfully", context);

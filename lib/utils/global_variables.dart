@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:instagram_clone/screens/add_post_screen.dart';
 import 'package:instagram_clone/screens/feed_screen.dart';
+import 'package:instagram_clone/screens/search_screen.dart';
 
 const webScreenWidth = 600;
 const homeScreenItems = [
   Center(child: FeedScreen()),
-  Center(child: Text('Search')),
+  Center(child: SearchScreen()),
   Center(child: AddPostScreen()),
   Center(child: Text('Notifications')),
   Center(child: Text('Profile')),
