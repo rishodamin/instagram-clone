@@ -7,6 +7,7 @@ class Post {
   final String postUrl;
   final String? profImage;
   final List<dynamic> likes;
+  final String storageId;
 
   const Post({
     required this.caption,
@@ -17,6 +18,7 @@ class Post {
     required this.profImage,
     required this.likes,
     required this.postUrl,
+    required this.storageId,
   });
 
   Map<String, dynamic> toJson() => {
@@ -28,6 +30,7 @@ class Post {
         'postUrl': postUrl,
         'likes': likes,
         'profImage': profImage,
+        'storageId': storageId,
       };
 
   // static Post fromSnap(DocumentSnapshot snap) {
@@ -42,6 +45,7 @@ class Post {
   //     profImage: snapshot["profImage"],
   //     likes: snapshot["likes"],
   //     postUrl: snapshot["postUrl"],
+  //     storageId: snapshot["storageId"],
   //   );
   // }
 }

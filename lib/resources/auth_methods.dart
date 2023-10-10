@@ -35,8 +35,9 @@ class AuthMethods {
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
         print(cred.user!.uid);
-        String photoUrl = await StorageMethods()
+        List<String> storageData = await StorageMethods()
             .uploadImageStorage('profilePics', file, false);
+        String photoUrl = storageData[0];
 
         model.User user = model.User(
           email: email,

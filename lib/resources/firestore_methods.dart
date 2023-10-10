@@ -17,19 +17,21 @@ class FirestoreMethods {
     String profImage,
   ) async {
     try {
-      String photoUrl =
+      List<String> storageData =
           await StorageMethods().uploadImageStorage('posts', file, true);
+      String photoUrl = storageData[0];
+      String storageId = storageData[1];
       String postId = const Uuid().v1();
       Post post = Post(
-        caption: caption,
-        uid: uid,
-        postId: postId,
-        username: username,
-        datePublished: DateTime.now(),
-        profImage: profImage,
-        likes: [],
-        postUrl: photoUrl,
-      );
+          caption: caption,
+          uid: uid,
+          postId: postId,
+          username: username,
+          datePublished: DateTime.now(),
+          profImage: profImage,
+          likes: [],
+          postUrl: photoUrl,
+          storageId: storageId);
 
       // adding to database
       _firestore.collection('posts').doc(postId).set(post.toJson());
@@ -80,6 +82,16 @@ class FirestoreMethods {
       } else {
         print('text is empty');
       }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // delete post
+  Future<void> deletePost(String postId, String storageId) async {
+    try {
+      _firestore.collection('posts').doc(postId).delete();
+      StorageMethods().deletePost(storageId);
     } catch (e) {
       print(e.toString());
     }

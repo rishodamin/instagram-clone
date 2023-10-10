@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/user.dart';
 import 'package:instagram_clone/providers/user_provider.dart';
@@ -18,10 +19,34 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   bool isLikeAnimating = false;
+  int commentLen = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getCommentLen();
+  }
+
+  void getCommentLen() async {
+    try {
+      QuerySnapshot comment = await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.snap['postId'])
+          .collection('comments')
+          .get();
+      setState(() {
+        commentLen = comment.docs.length;
+      });
+    } catch (e) {
+      print('something bad happen');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final User user = Provider.of<UserProvider>(context).getUser!;
     final bool isLiked = widget.snap['likes'].contains(user.uid);
+    final bool isMyPost = user.uid == widget.snap['uid'] ? true : false;
     return Container(
       color: mobileBackgroundColor,
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -56,9 +81,17 @@ class _PostCardState extends State<PostCard> {
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 16),
                                   shrinkWrap: true,
-                                  children: ['Delete']
+                                  children: (isMyPost ? ['Delete'] : ['Report'])
                                       .map((e) => InkWell(
-                                            onTap: () {},
+                                            onTap: () async {
+                                              if (e == 'Delete') {
+                                                FirestoreMethods().deletePost(
+                                                  widget.snap['postId'],
+                                                  widget.snap['storageId'],
+                                                );
+                                              }
+                                              Navigator.of(context).pop();
+                                            },
                                             child: Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
@@ -209,10 +242,14 @@ class _PostCardState extends State<PostCard> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
             child: InkWell(
-              onTap: () {},
-              child: const Text(
-                'View all 200 comments',
-                style: TextStyle(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => CommentsScreen(snap: widget.snap),
+                ),
+              ),
+              child: Text(
+                'View all $commentLen comments',
+                style: const TextStyle(
                   fontSize: 15,
                   color: secondaryColor,
                 ),
