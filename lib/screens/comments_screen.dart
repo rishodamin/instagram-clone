@@ -4,7 +4,6 @@ import 'package:instagram_clone/models/user.dart';
 import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/resources/firestore_methods.dart';
 import 'package:instagram_clone/utils/colors.dart';
-import 'package:instagram_clone/utils/global_variables.dart';
 import 'package:instagram_clone/widgets/comment_card.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +26,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final User? user = Provider.of<UserProvider>(context).getUser;
+    final User user = Provider.of<UserProvider>(context).getUser!;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: mobileBackgroundColor,
@@ -62,7 +61,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
         child: Row(
           children: [
             CircleAvatar(
-              backgroundImage: NetworkImage(user?.photoUrl ?? profileUrl),
+              backgroundImage: NetworkImage(user.photoUrl),
               radius: 18,
             ),
             Expanded(
@@ -72,7 +71,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   controller: _commentController,
                   maxLines: 10,
                   decoration: InputDecoration(
-                    hintText: 'Comment as ${user?.username}',
+                    hintText: 'Comment as ${user.username}',
                     border: InputBorder.none,
                   ),
                 ),
@@ -83,9 +82,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 FirestoreMethods().postComment(
                   widget.snap['postId'],
                   _commentController.text,
-                  user?.uid as String,
-                  user?.username as String,
-                  user?.photoUrl,
+                  user.uid,
+                  user.username,
+                  user.photoUrl,
                 );
                 setState(() {
                   _commentController.text = '';

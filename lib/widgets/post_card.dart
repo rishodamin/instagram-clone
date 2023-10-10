@@ -4,7 +4,6 @@ import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/resources/firestore_methods.dart';
 import 'package:instagram_clone/screens/comments_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
-import 'package:instagram_clone/utils/global_variables.dart';
 import 'package:instagram_clone/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -19,11 +18,10 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   bool isLikeAnimating = false;
-
   @override
   Widget build(BuildContext context) {
-    final User? user = Provider.of<UserProvider>(context).getUser;
-    final bool isLiked = widget.snap['likes'].contains(user?.uid);
+    final User user = Provider.of<UserProvider>(context).getUser!;
+    final bool isLiked = widget.snap['likes'].contains(user.uid);
     return Container(
       color: mobileBackgroundColor,
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -37,8 +35,7 @@ class _PostCardState extends State<PostCard> {
               children: [
                 CircleAvatar(
                   radius: 16,
-                  backgroundImage:
-                      NetworkImage(widget.snap['profImage'] ?? profileUrl),
+                  backgroundImage: NetworkImage(widget.snap['profImage']),
                 ),
                 Expanded(
                   child: Padding(
@@ -91,7 +88,7 @@ class _PostCardState extends State<PostCard> {
             onDoubleTap: () {
               FirestoreMethods().likePost(
                 widget.snap['postId'],
-                user?.uid as String,
+                user.uid,
                 widget.snap['likes'],
               );
               setState(() {
@@ -138,7 +135,7 @@ class _PostCardState extends State<PostCard> {
                 onPressed: () {
                   FirestoreMethods().likePost(
                     widget.snap['postId'],
-                    user?.uid as String,
+                    user.uid,
                     widget.snap['likes'],
                     fromHeart: true,
                   );

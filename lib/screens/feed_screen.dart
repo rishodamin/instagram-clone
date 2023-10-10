@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:instagram_clone/widgets/post_card.dart';
+import 'package:provider/provider.dart';
 
 class FeedScreen extends StatelessWidget {
   const FeedScreen({super.key});
@@ -26,7 +29,8 @@ class FeedScreen extends StatelessWidget {
         stream: FirebaseFirestore.instance.collection('posts').snapshots(),
         builder: (context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              Provider.of<UserProvider>(context).getUser == null) {
             return const Center(child: CircularProgressIndicator());
           }
           return ListView.builder(

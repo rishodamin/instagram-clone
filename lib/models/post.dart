@@ -27,6 +27,7 @@ class Post {
         'datePublished': datePublished,
         'postUrl': postUrl,
         'likes': likes,
+        'profImage': profImage,
       };
 
   // static Post fromSnap(DocumentSnapshot snap) {

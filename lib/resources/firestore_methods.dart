@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,7 +14,7 @@ class FirestoreMethods {
     Uint8List file,
     String uid,
     String username,
-    String? profImage,
+    String profImage,
   ) async {
     try {
       String photoUrl =
@@ -60,7 +59,7 @@ class FirestoreMethods {
   }
 
   Future<void> postComment(String postId, String text, String uid, String name,
-      String? profilePic) async {
+      String profilePic) async {
     try {
       if (text.isNotEmpty) {
         String commentId = const Uuid().v1();
