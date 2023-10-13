@@ -41,10 +41,10 @@ class FirestoreMethods {
     }
   }
 
-  Future<void> likePost(String postId, String uid, List likes,
+  Future<void> likePost(String postId, String uid, bool isLiked,
       {bool fromHeart = false}) async {
     try {
-      if (likes.contains(uid)) {
+      if (isLiked) {
         if (fromHeart) {
           _firestore.collection('posts').doc(postId).update({
             'likes': FieldValue.arrayRemove([uid])
@@ -77,10 +77,37 @@ class FirestoreMethods {
           'text': text,
           'commentId': commentId,
           'datePublished': DateTime.now(),
-          'likes': 0,
+          'likes': [],
         });
       } else {
         print('text is empty');
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> likeComment(
+      String postId, String commentId, String uid, bool isLiked) async {
+    try {
+      if (isLiked) {
+        _firestore
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .update({
+          'likes': FieldValue.arrayRemove([uid])
+        });
+      } else {
+        _firestore
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .update({
+          'likes': FieldValue.arrayUnion([uid])
+        });
       }
     } catch (e) {
       print(e.toString());
@@ -92,6 +119,35 @@ class FirestoreMethods {
     try {
       _firestore.collection('posts').doc(postId).delete();
       StorageMethods().deletePost(storageId);
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  //follow user
+  Future<void> followUser(
+    String uid,
+    String followId,
+    bool isfollowing,
+  ) async {
+    try {
+      if (isfollowing) {
+        _firestore.collection('users').doc(followId).update({
+          'followers': FieldValue.arrayRemove([uid])
+        });
+
+        _firestore.collection('users').doc(uid).update({
+          'following': FieldValue.arrayRemove([followId])
+        });
+      } else {
+        _firestore.collection('users').doc(followId).update({
+          'followers': FieldValue.arrayUnion([uid])
+        });
+
+        _firestore.collection('users').doc(uid).update({
+          'following': FieldValue.arrayUnion([followId])
+        });
+      }
     } catch (e) {
       print(e.toString());
     }

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram_clone/providers/user_provider.dart';
+import 'package:instagram_clone/screens/message_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:instagram_clone/widgets/post_card.dart';
 import 'package:provider/provider.dart';
@@ -22,15 +23,20 @@ class FeedScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-              onPressed: () {}, icon: const Icon(Icons.messenger_outline))
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const MessageScreen())),
+              icon: const Icon(Icons.messenger_outline))
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('posts')
+            .orderBy('datePublished', descending: true)
+            .snapshots(),
         builder: (context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting ||
-              Provider.of<UserProvider>(context).getUser == null) {
+              !snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
           return ListView.builder(

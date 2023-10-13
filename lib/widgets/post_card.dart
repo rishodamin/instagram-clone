@@ -122,7 +122,7 @@ class _PostCardState extends State<PostCard> {
               FirestoreMethods().likePost(
                 widget.snap['postId'],
                 user.uid,
-                widget.snap['likes'],
+                isLiked,
               );
               setState(() {
                 isLikeAnimating = true;
@@ -169,7 +169,7 @@ class _PostCardState extends State<PostCard> {
                   FirestoreMethods().likePost(
                     widget.snap['postId'],
                     user.uid,
-                    widget.snap['likes'],
+                    isLiked,
                     fromHeart: true,
                   );
                 },

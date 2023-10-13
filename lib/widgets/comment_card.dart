@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/resources/firestore_methods.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:intl/intl.dart';
 
 class CommentCard extends StatefulWidget {
   final Map<String, dynamic> snap;
-  const CommentCard({super.key, required this.snap});
+  final String postId;
+  final String myUid;
+  const CommentCard({
+    super.key,
+    required this.snap,
+    required this.postId,
+    required this.myUid,
+  });
 
   @override
   State<CommentCard> createState() => _CommentCardState();
@@ -13,6 +21,8 @@ class CommentCard extends StatefulWidget {
 class _CommentCardState extends State<CommentCard> {
   @override
   Widget build(BuildContext context) {
+    bool isLiked = widget.snap['likes'].contains(widget.myUid);
+    int totalLikes = widget.snap['likes'].length;
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: 18,
@@ -61,13 +71,25 @@ class _CommentCardState extends State<CommentCard> {
             padding: const EdgeInsets.only(right: 4, top: 8),
             child: Column(
               children: [
-                Icon(
-                  Icons.favorite,
-                  size: 22,
-                  color: Colors.red,
+                InkWell(
+                  onTap: () {
+                    FirestoreMethods().likeComment(
+                      widget.postId,
+                      widget.snap['commentId'],
+                      widget.myUid,
+                      isLiked,
+                    );
+                  },
+                  child: isLiked
+                      ? const Icon(
+                          Icons.favorite,
+                          size: 22,
+                          color: Colors.red,
+                        )
+                      : const Icon(Icons.favorite_border),
                 ),
-                SizedBox(height: 2),
-                Text('2'),
+                const SizedBox(height: 2),
+                if (totalLikes > 0) Text(totalLikes.toString()),
               ],
             ),
           ),

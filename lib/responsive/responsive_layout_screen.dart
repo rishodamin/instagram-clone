@@ -29,14 +29,18 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth > webScreenWidth) {
-          return widget.webScreenLayout;
-        } else {
-          return widget.mobileScreenLayout;
-        }
-      },
-    );
+    return (Provider.of<UserProvider>(context).getUser == null)
+        ? const Center(
+            child: CircularProgressIndicator(),
+          )
+        : LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth > webScreenWidth) {
+                return widget.webScreenLayout;
+              } else {
+                return widget.mobileScreenLayout;
+              }
+            },
+          );
   }
 }

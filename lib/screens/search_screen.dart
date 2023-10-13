@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:instagram_clone/screens/profile_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -63,13 +64,18 @@ class _SearchScreenState extends State<SearchScreen> {
                 return ListView.builder(
                   itemCount: data.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(data[index]['photoUrl']),
-                          radius: 16,
-                        ),
-                        title: Text(data[index]['username']));
+                    return InkWell(
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              ProfileScreen(uid: data[index]['uid']))),
+                      child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage:
+                                NetworkImage(data[index]['photoUrl']),
+                            radius: 16,
+                          ),
+                          title: Text(data[index]['username'])),
+                    );
                   },
                 );
               },
@@ -83,11 +89,14 @@ class _SearchScreenState extends State<SearchScreen> {
                 }
                 List<QueryDocumentSnapshot<Map<String, dynamic>>> data =
                     snapshot.data!.docs;
+                data.shuffle();
                 return StaggeredGridView.countBuilder(
                   crossAxisCount: 3,
                   itemCount: data.length,
-                  itemBuilder: (context, index) =>
-                      Image.network(data[index]['postUrl']),
+                  itemBuilder: (context, index) => Image(
+                    image: NetworkImage(data[index]['postUrl']),
+                    fit: BoxFit.cover,
+                  ),
                   staggeredTileBuilder: (index) {
                     return StaggeredTile.count(
                       (index % 7 == 0) ? 2 : 1,
