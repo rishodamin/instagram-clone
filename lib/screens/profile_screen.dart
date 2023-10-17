@@ -1,8 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/user.dart';
+import 'package:instagram_clone/models/user.dart' as model;
 import 'package:instagram_clone/providers/user_provider.dart';
+import 'package:instagram_clone/resources/auth_methods.dart';
 import 'package:instagram_clone/resources/firestore_methods.dart';
+import 'package:instagram_clone/screens/chat_screen.dart';
+import 'package:instagram_clone/screens/edit_profile.dart';
+import 'package:instagram_clone/screens/login_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/follow_button.dart';
@@ -19,7 +23,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? userData;
   List<QueryDocumentSnapshot<Map<String, dynamic>>>? postData;
-  User? myId;
+  model.User? myId;
   bool? isfollowing;
   int followingLen = 0;
   int followersLen = 0;
@@ -63,6 +67,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         backgroundColor: mobileBackgroundColor,
         title: Text(userData!['username']),
+        actions: [
+          InkWell(
+            onTap: () => showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('Are you sure?'),
+                  content: const Text('Are you sure you want log out?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        AuthMethods().logOut();
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (context) => const LoginScreen()));
+                      },
+                      child: const Text('Yes'),
+                    ),
+                    TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('No')),
+                  ],
+                );
+              },
+            ),
+            child: const Padding(
+              padding: EdgeInsets.only(top: 20, right: 20),
+              child: Text(
+                'Log out',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          )
+        ],
       ),
       body: ListView(
         children: [
@@ -99,15 +136,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     )
                   ],
                 ),
-                SizedBox(
-                  width: 250,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 20, bottom: 10),
-                    child: Text(userData!['bio']),
+                if (userData!['name'] != null)
+                  SizedBox(
+                    width: 250,
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.only(top: 20, bottom: 4, left: 10),
+                      child: Text(
+                        userData!['name'],
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 16),
+                      ),
+                    ),
                   ),
-                ),
+                if (userData!['bio'] != null)
+                  SizedBox(
+                    width: 250,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10, left: 10),
+                      child: Text(userData!['bio']),
+                    ),
+                  ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     FollowButton(
                       bgColor: myId!.uid == widget.uid
@@ -123,7 +174,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           : (isfollowing! ? 'Unfollow' : 'Follow'),
                       textcolor: primaryColor,
                       onPressed: myId!.uid == widget.uid
-                          ? () {}
+                          ? () => Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => EditProfile(
+                                    name: userData!['name'],
+                                    bio: userData!['bio'],
+                                    uid: myId!.uid,
+                                    photoUrl: myId!.photoUrl,
+                                  )))
                           : () {
                               setState(() {
                                 FirestoreMethods().followUser(
@@ -132,6 +189,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 isfollowing = !isfollowing!;
                               });
                             },
+                    ),
+                    FollowButton(
+                      bgColor: myId!.uid == widget.uid
+                          ? mobileBackgroundColor
+                          : const Color.fromRGBO(40, 40, 40, 1),
+                      borderColor: myId!.uid == widget.uid
+                          ? Colors.grey
+                          : const Color.fromRGBO(30, 30, 30, 1),
+                      text:
+                          myId!.uid == widget.uid ? 'Share Profile' : 'Message',
+                      textcolor: primaryColor,
+                      onPressed: () =>
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                    dudeName: userData!['username'],
+                                    dudePic: userData!['photoUrl'],
+                                  ))),
                     ),
                   ],
                 ),

@@ -1,11 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:instagram_clone/screens/chat_screen.dart';
 import 'package:instagram_clone/screens/profile_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  final bool fromMessage;
+  const SearchScreen({
+    super.key,
+    required this.fromMessage,
+  });
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -13,12 +18,14 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocus = FocusNode();
   bool searched = false;
 
   @override
   void dispose() {
     super.dispose();
     _searchController.dispose();
+    _searchFocus.dispose();
   }
 
   @override
@@ -27,15 +34,19 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => setState(
-            () {
-              _searchController.text = '';
-              searched = false;
-            },
-          ),
+          onPressed: () => (widget.fromMessage)
+              ? Navigator.of(context).pop()
+              : setState(
+                  () {
+                    _searchController.text = '';
+                    searched = false;
+                  },
+                ),
         ),
         backgroundColor: mobileBackgroundColor,
         title: TextFormField(
+          autofocus: true,
+          focusNode: _searchFocus,
           controller: _searchController,
           decoration: const InputDecoration(
             labelText: 'Search Users',
@@ -66,48 +77,59 @@ class _SearchScreenState extends State<SearchScreen> {
                   itemBuilder: (context, index) {
                     return InkWell(
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              ProfileScreen(uid: data[index]['uid']))),
-                      child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(data[index]['photoUrl']),
-                            radius: 16,
-                          ),
-                          title: Text(data[index]['username'])),
+                          builder: (context) => widget.fromMessage
+                              ? ChatScreen(
+                                  dudeName: data[index]['username'],
+                                  dudePic: data[index]['photoUrl'])
+                              : ProfileScreen(uid: data[index]['uid']))),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(data[index]['photoUrl']),
+                              radius: 24,
+                            ),
+                            title: Text(
+                              data[index]['username'],
+                              style: const TextStyle(fontSize: 22),
+                            )),
+                      ),
                     );
                   },
                 );
               },
             )
-          : FutureBuilder(
-              future: FirebaseFirestore.instance.collection('posts').get(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting ||
-                    !snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                List<QueryDocumentSnapshot<Map<String, dynamic>>> data =
-                    snapshot.data!.docs;
-                data.shuffle();
-                return StaggeredGridView.countBuilder(
-                  crossAxisCount: 3,
-                  itemCount: data.length,
-                  itemBuilder: (context, index) => Image(
-                    image: NetworkImage(data[index]['postUrl']),
-                    fit: BoxFit.cover,
-                  ),
-                  staggeredTileBuilder: (index) {
-                    return StaggeredTile.count(
-                      (index % 7 == 0) ? 2 : 1,
-                      (index % 7 == 0) ? 2 : 1,
+          : widget.fromMessage
+              ? Container()
+              : FutureBuilder(
+                  future: FirebaseFirestore.instance.collection('posts').get(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting ||
+                        !snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    List<QueryDocumentSnapshot<Map<String, dynamic>>> data =
+                        snapshot.data!.docs;
+                    data.shuffle();
+                    return StaggeredGridView.countBuilder(
+                      crossAxisCount: 3,
+                      itemCount: data.length,
+                      itemBuilder: (context, index) => Image(
+                        image: NetworkImage(data[index]['postUrl']),
+                        fit: BoxFit.cover,
+                      ),
+                      staggeredTileBuilder: (index) {
+                        return StaggeredTile.count(
+                          (index % 7 == 0) ? 2 : 1,
+                          (index % 7 == 0) ? 2 : 1,
+                        );
+                      },
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
                     );
                   },
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                );
-              },
-            ),
+                ),
     );
   }
 }

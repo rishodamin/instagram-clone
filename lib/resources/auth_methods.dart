@@ -25,16 +25,21 @@ class AuthMethods {
     required String username,
     required String bio,
     required Uint8List file,
+    required String name,
   }) async {
-    if (email.isNotEmpty &&
-        password.isNotEmpty &&
-        email.isNotEmpty &&
-        bio.isNotEmpty) {
+    if (email.isNotEmpty && password.isNotEmpty && username.isNotEmpty) {
+      var userSnap = await _firestore
+          .collection('users')
+          .where('username', isEqualTo: username)
+          .get();
+      int userLen = userSnap.docs.length;
+      if (userLen > 0) {
+        return 'Username already exists';
+      }
       try {
         // register user
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
-        print(cred.user!.uid);
         List<String> storageData = await StorageMethods()
             .uploadImageStorage('profilePics', file, false);
         String photoUrl = storageData[0];
@@ -44,6 +49,8 @@ class AuthMethods {
           uid: cred.user!.uid,
           photoUrl: photoUrl,
           username: username,
+          password: password,
+          name: name,
           bio: bio,
           followers: [],
           following: [],
@@ -59,7 +66,7 @@ class AuthMethods {
         return e.toString();
       }
     }
-    return 'Some Fields have to be fill';
+    return 'First three Fields have to be fill';
   }
 
   // login user
@@ -77,5 +84,9 @@ class AuthMethods {
       }
     }
     return 'Some fields have to be fill';
+  }
+
+  Future<void> logOut() async {
+    _auth.signOut();
   }
 }

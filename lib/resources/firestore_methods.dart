@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:instagram_clone/models/post.dart';
+import 'package:instagram_clone/resources/auth_methods.dart';
 import 'package:instagram_clone/resources/storage_methods.dart';
+import 'package:instagram_clone/utils/global_variables.dart';
 import 'package:uuid/uuid.dart';
 
 class FirestoreMethods {
@@ -151,5 +153,40 @@ class FirestoreMethods {
     } catch (e) {
       print(e.toString());
     }
+  }
+
+  Future<void> sendMessage(
+    String message,
+    String sender,
+    String receiver,
+    String senderProfImage,
+    String receiverProfImage,
+  ) async {
+    if (message.isEmpty) {
+      return;
+    }
+    final roomId = getRoomId(sender, receiver);
+    final roomRef = _firestore.collection('messages').doc(roomId);
+    roomRef.get().then(
+          (value) => {
+            if (!value.exists)
+              {
+                roomRef.set({
+                  'owners': [sender, receiver],
+                  sender: senderProfImage,
+                  receiver: receiverProfImage,
+                })
+              }
+          },
+        );
+    String messageId = const Uuid().v1();
+    final room = roomRef.collection('Room').doc(messageId);
+    room.set({
+      'sender': sender,
+      'receiver': receiver,
+      'message': message,
+      'date': DateTime.now(),
+      'messageId': messageId,
+    }).then((_) => roomRef.update({'lastMessage': DateTime.now()}));
   }
 }

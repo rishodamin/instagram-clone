@@ -23,6 +23,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   Uint8List? _image;
   bool _isLoading = false;
 
@@ -39,6 +40,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _passwordController.dispose();
     _bioController.dispose();
     _usernameController.dispose();
+    _nameController.dispose();
   }
 
   void selectImage() async {
@@ -65,6 +67,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       username: _usernameController.text,
       bio: _bioController.text,
       file: _image!,
+      name: _nameController.text,
     );
     setState(() {
       _isLoading = false;
@@ -142,7 +145,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                         // username
                         TextFieldInput(
-                          hintText: 'Enter your Username',
+                          hintText: 'Enter a Username',
                           textInputType: TextInputType.emailAddress,
                           textEditingController: _usernameController,
                         ),
@@ -160,7 +163,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                         // password
                         TextFieldInput(
-                          hintText: 'Enter your password',
+                          hintText: 'Enter a password',
                           textInputType: TextInputType.text,
                           textEditingController: _passwordController,
                           isPass: true,
@@ -168,11 +171,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                         const SizedBox(height: 24),
 
+                        // Name
+                        TextField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                              hintText: 'Your Name (Optional)'),
+                        ),
+
+                        const SizedBox(height: 24),
+
                         // Bio
-                        TextFieldInput(
-                          hintText: 'Something about you!',
-                          textInputType: TextInputType.emailAddress,
-                          textEditingController: _bioController,
+                        TextField(
+                          maxLength: 40,
+                          controller: _bioController,
+                          maxLines: null,
+                          decoration: const InputDecoration(
+                              hintText: 'Something about you (Optional)'),
                         ),
 
                         const SizedBox(height: 24),

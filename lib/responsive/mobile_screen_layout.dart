@@ -35,7 +35,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
       body: PageView(
           controller: pageController,
           physics: const NeverScrollableScrollPhysics(),
-          children: homeScreenItems),
+          children: navigatingList()),
       bottomNavigationBar: CupertinoTabBar(
         activeColor: primaryColor,
         currentIndex: _page,
