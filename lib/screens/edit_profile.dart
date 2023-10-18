@@ -26,20 +26,12 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
-  Uint8List? _image;
 
   @override
   void dispose() {
     super.dispose();
     _nameController.dispose();
     _bioController.dispose();
-  }
-
-  void selectImage() async {
-    Uint8List im = await pickImage(ImageSource.gallery);
-    setState(() {
-      _image = im;
-    });
   }
 
   @override
@@ -51,78 +43,56 @@ class _EditProfileState extends State<EditProfile> {
         backgroundColor: mobileBackgroundColor,
         title: const Text('Edit Profile'),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 30, bottom: 60),
-                alignment: Alignment.center,
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 64,
-                      backgroundImage: (_image == null
-                          ? NetworkImage(widget.photoUrl)
-                          : MemoryImage(_image!)) as ImageProvider<Object>?,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Name',
+                  style: TextStyle(fontSize: 18),
+                ),
+                TextField(controller: _nameController),
+                const SizedBox(height: 30),
+                const Text(
+                  'Bio',
+                  style: TextStyle(fontSize: 18),
+                ),
+                TextField(
+                  controller: _bioController,
+                  maxLines: null,
+                  maxLength: 40,
+                ),
+                const SizedBox(height: 50),
+                InkWell(
+                  onTap: () {
+                    showSnackBar('Updating... Stay in the page', context);
+                    var userRef = FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(widget.uid);
+                    userRef.update({
+                      'name': _nameController.text,
+                      'bio': _bioController.text,
+                    }).then((_) {
+                      showSnackBar('Updated succesfuly', context);
+                      Navigator.of(context)
+                          .pop([_nameController.text, _bioController.text]);
+                    });
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 40,
+                    child: const Text(
+                      'Update',
+                      style: TextStyle(fontSize: 18),
                     ),
-                    Positioned(
-                      bottom: -10,
-                      left: 80,
-                      child: IconButton(
-                        onPressed: selectImage,
-                        icon: const Icon(
-                          Icons.add_a_photo,
-                          color: blueColor,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              const Text(
-                'Name',
-                style: const TextStyle(fontSize: 18),
-              ),
-              TextField(controller: _nameController),
-              const SizedBox(height: 30),
-              const Text(
-                'Bio',
-                style: const TextStyle(fontSize: 18),
-              ),
-              TextField(
-                controller: _bioController,
-                maxLines: null,
-                maxLength: 40,
-              ),
-              const SizedBox(height: 50),
-              InkWell(
-                onTap: () {
-                  showSnackBar('Updating... Stay in the page', context);
-                  var userRef = FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(widget.uid);
-                  userRef.update({
-                    'name': _nameController.text,
-                    'bio': _bioController.text,
-                  }).then((_) {
-                    showSnackBar('Updated succesfuly', context);
-                    Navigator.of(context).pop();
-                  });
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 40,
-                  child: const Text(
-                    'Update',
-                    style: TextStyle(fontSize: 18),
+                    color: const Color.fromRGBO(30, 30, 30, 1),
                   ),
-                  color: const Color.fromRGBO(30, 30, 30, 1),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),

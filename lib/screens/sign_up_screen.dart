@@ -80,6 +80,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           builder: (context) => const ResponsiveLayout(
             webScreenLayout: WebScreenLayout(),
             mobileScreenLayout: MobileScreenLayout(),
+            isGuest: false,
           ),
         ),
       );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/resources/auth_methods.dart';
 import 'package:instagram_clone/responsive/mobile_screen_layout.dart';
 import 'package:instagram_clone/responsive/responsive_layout_screen.dart';
@@ -8,6 +9,7 @@ import 'package:instagram_clone/screens/sign_up_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -42,11 +44,13 @@ class _LoginScreenState extends State<LoginScreen> {
     if (res != 'succes')
       showSnackBar(res, context);
     else {
+      Provider.of<UserProvider>(context, listen: false).loginMode();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const ResponsiveLayout(
             webScreenLayout: WebScreenLayout(),
             mobileScreenLayout: MobileScreenLayout(),
+            isGuest: false,
           ),
         ),
       );
@@ -72,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               //flex box 1
-              Flexible(flex: 1, child: Container()),
+              Flexible(flex: 4, child: Container()),
 
               //Logo
               SvgPicture.asset(
@@ -125,9 +129,36 @@ class _LoginScreenState extends State<LoginScreen> {
                       : const Text('Log in'),
                 ),
               ),
-              const SizedBox(height: 12),
-              // flex box 2
               Flexible(flex: 1, child: Container()),
+              const Text('or'),
+              Flexible(flex: 1, child: Container()),
+              InkWell(
+                onTap: () {
+                  Provider.of<UserProvider>(context, listen: false).guestMode();
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const ResponsiveLayout(
+                            webScreenLayout: WebScreenLayout(),
+                            mobileScreenLayout: MobileScreenLayout(),
+                            isGuest: true,
+                          )));
+                },
+                child: Container(
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: const ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(4),
+                      ),
+                    ),
+                    color: Color.fromRGBO(40, 40, 40, 1),
+                  ),
+                  child: const Text('Enter as a Guest'),
+                ),
+              ),
+              // flex box 2
+              Flexible(flex: 3, child: Container()),
 
               // Transitioning to sign up
               Row(

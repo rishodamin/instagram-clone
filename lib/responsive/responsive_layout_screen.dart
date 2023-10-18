@@ -6,10 +6,12 @@ import 'package:provider/provider.dart';
 class ResponsiveLayout extends StatefulWidget {
   final Widget webScreenLayout;
   final Widget mobileScreenLayout;
+  final bool isGuest;
   const ResponsiveLayout({
     super.key,
     required this.webScreenLayout,
     required this.mobileScreenLayout,
+    required this.isGuest,
   });
 
   @override
@@ -20,7 +22,9 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
   @override
   void initState() {
     super.initState();
-    addData();
+    if (!widget.isGuest) {
+      addData();
+    }
   }
 
   addData() async {
@@ -29,18 +33,21 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return (Provider.of<UserProvider>(context).getUser == null)
+    print(Provider.of<UserProvider>(context).isGuest);
+    return (!Provider.of<UserProvider>(context).isGuest &&
+            Provider.of<UserProvider>(context).getUser == null)
         ? const Center(
             child: CircularProgressIndicator(),
           )
-        : LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth > webScreenWidth) {
-                return widget.webScreenLayout;
-              } else {
-                return widget.mobileScreenLayout;
-              }
-            },
-          );
+        : widget.mobileScreenLayout;
+    // : LayoutBuilder(
+    //     builder: (context, constraints) {
+    //       if (constraints.maxWidth > webScreenWidth) {
+    //         return widget.webScreenLayout;
+    //       } else {
+    //         return widget.mobileScreenLayout;
+    //       }
+    //     },
+    //   );
   }
 }

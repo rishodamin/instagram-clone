@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/resources/firestore_methods.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/utils.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class CommentCard extends StatefulWidget {
   final Map<String, dynamic> snap;
@@ -21,7 +24,9 @@ class CommentCard extends StatefulWidget {
 class _CommentCardState extends State<CommentCard> {
   @override
   Widget build(BuildContext context) {
-    bool isLiked = widget.snap['likes'].contains(widget.myUid);
+    final bool isGuest = Provider.of<UserProvider>(context).isGuest;
+    bool isLiked =
+        isGuest ? false : widget.snap['likes'].contains(widget.myUid);
     int totalLikes = widget.snap['likes'].length;
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -73,12 +78,16 @@ class _CommentCardState extends State<CommentCard> {
               children: [
                 InkWell(
                   onTap: () {
-                    FirestoreMethods().likeComment(
-                      widget.postId,
-                      widget.snap['commentId'],
-                      widget.myUid,
-                      isLiked,
-                    );
+                    if (!isGuest) {
+                      FirestoreMethods().likeComment(
+                        widget.postId,
+                        widget.snap['commentId'],
+                        widget.myUid,
+                        isLiked,
+                      );
+                    } else {
+                      showSnackBar('Login required to like', context);
+                    }
                   },
                   child: isLiked
                       ? const Icon(

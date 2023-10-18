@@ -60,45 +60,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (userData == null || postData == null) {
       return const Center(child: CircularProgressIndicator());
     }
-    myId = Provider.of<UserProvider>(context).getUser;
-    isfollowing ??= userData!['followers'].contains(myId!.uid);
+    final bool isGuest = Provider.of<UserProvider>(context).isGuest;
+    if (isGuest) {
+      isfollowing = false;
+    } else {
+      myId = Provider.of<UserProvider>(context).getUser;
+      isfollowing ??= userData!['followers'].contains(myId!.uid);
+    }
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: mobileBackgroundColor,
         title: Text(userData!['username']),
         actions: [
-          InkWell(
-            onTap: () => showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: const Text('Are you sure?'),
-                  content: const Text('Are you sure you want log out?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        AuthMethods().logOut();
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => const LoginScreen()));
-                      },
-                      child: const Text('Yes'),
-                    ),
-                    TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('No')),
-                  ],
-                );
-              },
-            ),
-            child: const Padding(
-              padding: EdgeInsets.only(top: 20, right: 20),
-              child: Text(
-                'Log out',
-                style: TextStyle(fontSize: 16),
+          if (!isGuest && myId?.uid == widget.uid)
+            InkWell(
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Are you sure?'),
+                    content: const Text('Are you sure you want log out?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          AuthMethods().logOut();
+                          Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()));
+                        },
+                        child: const Text('Yes'),
+                      ),
+                      TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('No')),
+                    ],
+                  );
+                },
               ),
-            ),
-          )
+              child: const Padding(
+                padding: EdgeInsets.only(top: 20, right: 20),
+                child: Text(
+                  'Log out',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            )
         ],
       ),
       body: ListView(
@@ -161,7 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     FollowButton(
-                      bgColor: myId!.uid == widget.uid
+                      bgColor: !isGuest && myId!.uid == widget.uid
                           ? mobileBackgroundColor
                           : (isfollowing!
                               ? const Color.fromRGBO(40, 40, 40, 1)
@@ -169,43 +176,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       borderColor: isfollowing!
                           ? const Color.fromRGBO(30, 30, 30, 1)
                           : Colors.grey,
-                      text: myId!.uid == widget.uid
+                      text: !isGuest && myId!.uid == widget.uid
                           ? 'Edit Profile'
                           : (isfollowing! ? 'Unfollow' : 'Follow'),
                       textcolor: primaryColor,
-                      onPressed: myId!.uid == widget.uid
-                          ? () => Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => EditProfile(
-                                    name: userData!['name'],
-                                    bio: userData!['bio'],
-                                    uid: myId!.uid,
-                                    photoUrl: myId!.photoUrl,
-                                  )))
+                      onPressed: !isGuest && myId!.uid == widget.uid
+                          ? () async {
+                              List<String> updatedData =
+                                  await Navigator.of(context)
+                                      .push(MaterialPageRoute(
+                                          builder: (context) => EditProfile(
+                                                name: userData!['name'],
+                                                bio: userData!['bio'],
+                                                uid: myId!.uid,
+                                                photoUrl: myId!.photoUrl,
+                                              )));
+                              setState(() {
+                                userData?['name'] = updatedData[0];
+                                userData?['bio'] = updatedData[1];
+                              });
+                            }
                           : () {
                               setState(() {
-                                FirestoreMethods().followUser(
-                                    myId!.uid, widget.uid, isfollowing!);
-                                followersLen += isfollowing! ? -1 : 1;
-                                isfollowing = !isfollowing!;
+                                if (!isGuest) {
+                                  FirestoreMethods().followUser(
+                                      myId!.uid, widget.uid, isfollowing!);
+                                  followersLen += isfollowing! ? -1 : 1;
+                                  isfollowing = !isfollowing!;
+                                } else {
+                                  showSnackBar('Login required to follow users',
+                                      context);
+                                }
                               });
                             },
                     ),
                     FollowButton(
-                      bgColor: myId!.uid == widget.uid
+                      bgColor: !isGuest && myId!.uid == widget.uid
                           ? mobileBackgroundColor
                           : const Color.fromRGBO(40, 40, 40, 1),
-                      borderColor: myId!.uid == widget.uid
+                      borderColor: !isGuest && myId!.uid == widget.uid
                           ? Colors.grey
                           : const Color.fromRGBO(30, 30, 30, 1),
-                      text:
-                          myId!.uid == widget.uid ? 'Share Profile' : 'Message',
+                      text: !isGuest && myId!.uid == widget.uid
+                          ? 'Share Profile'
+                          : 'Message',
                       textcolor: primaryColor,
-                      onPressed: () =>
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => ChatScreen(
-                                    dudeName: userData!['username'],
-                                    dudePic: userData!['photoUrl'],
-                                  ))),
+                      onPressed: () {
+                        if (!isGuest) {
+                          if (myId!.uid != widget.uid) {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => ChatScreen(
+                                      dudeName: userData!['username'],
+                                      dudePic: userData!['photoUrl'],
+                                    )));
+                          } else {
+                            showSnackBar(
+                                'This feature is not added yet :(', context);
+                          }
+                        } else {
+                          showSnackBar('Login required to message', context);
+                        }
+                      },
                     ),
                   ],
                 ),

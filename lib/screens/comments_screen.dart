@@ -4,6 +4,7 @@ import 'package:instagram_clone/models/user.dart';
 import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/resources/firestore_methods.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/comment_card.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +27,11 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final User user = Provider.of<UserProvider>(context).getUser!;
+    final bool isGuest = Provider.of<UserProvider>(context).isGuest;
+    late User user;
+    if (!isGuest) {
+      user = Provider.of<UserProvider>(context).getUser!;
+    }
     return Scaffold(
       appBar: AppBar(
         backgroundColor: mobileBackgroundColor,
@@ -54,7 +59,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
             itemBuilder: (context, index) => CommentCard(
               snap: snapshot.data!.docs[index].data(),
               postId: widget.snap['postId'],
-              myUid: user.uid,
+              myUid: isGuest ? '' : user.uid,
             ),
           );
         },
@@ -68,7 +73,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
         child: Row(
           children: [
             CircleAvatar(
-              backgroundImage: NetworkImage(user.photoUrl),
+              backgroundImage: NetworkImage(isGuest ? '' : user.photoUrl),
               radius: 18,
             ),
             Expanded(
@@ -78,7 +83,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   controller: _commentController,
                   maxLines: 10,
                   decoration: InputDecoration(
-                    hintText: 'Comment as ${user.username}',
+                    hintText: isGuest
+                        ? 'Login required to comment'
+                        : 'Comment as ${user.username}',
                     border: InputBorder.none,
                   ),
                 ),
@@ -86,16 +93,20 @@ class _CommentsScreenState extends State<CommentsScreen> {
             ),
             InkWell(
               onTap: () {
-                FirestoreMethods().postComment(
-                  widget.snap['postId'],
-                  _commentController.text,
-                  user.uid,
-                  user.username,
-                  user.photoUrl,
-                );
-                setState(() {
-                  _commentController.text = '';
-                });
+                if (!isGuest) {
+                  FirestoreMethods().postComment(
+                    widget.snap['postId'],
+                    _commentController.text,
+                    user.uid,
+                    user.username,
+                    user.photoUrl,
+                  );
+                  setState(() {
+                    _commentController.text = '';
+                  });
+                } else {
+                  showSnackBar('Login required to comment', context);
+                }
               },
               child: const Text(
                 'Send',

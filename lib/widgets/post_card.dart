@@ -5,6 +5,7 @@ import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/resources/firestore_methods.dart';
 import 'package:instagram_clone/screens/comments_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -44,9 +45,19 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    final User user = Provider.of<UserProvider>(context).getUser!;
-    final bool isLiked = widget.snap['likes'].contains(user.uid);
-    final bool isMyPost = user.uid == widget.snap['uid'] ? true : false;
+    final isGuest = Provider.of<UserProvider>(context).isGuest;
+    late User user;
+    bool isLiked;
+    bool isMyPost;
+    if (!isGuest) {
+      user = Provider.of<UserProvider>(context).getUser!;
+      isLiked = widget.snap['likes'].contains(user.uid);
+      isMyPost = user.uid == widget.snap['uid'] ? true : false;
+    } else {
+      isLiked = false;
+      isMyPost = false;
+    }
+
     return Container(
       color: mobileBackgroundColor,
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -119,14 +130,18 @@ class _PostCardState extends State<PostCard> {
           // Image Section
           GestureDetector(
             onDoubleTap: () {
-              FirestoreMethods().likePost(
-                widget.snap['postId'],
-                user.uid,
-                isLiked,
-              );
-              setState(() {
-                isLikeAnimating = true;
-              });
+              if (!isGuest) {
+                FirestoreMethods().likePost(
+                  widget.snap['postId'],
+                  user.uid,
+                  isLiked,
+                );
+                setState(() {
+                  isLikeAnimating = true;
+                });
+              } else {
+                showSnackBar('Login required to like', context);
+              }
             },
             child: Stack(
               alignment: Alignment.center,
@@ -166,12 +181,16 @@ class _PostCardState extends State<PostCard> {
               IconButton(
                 iconSize: 32,
                 onPressed: () {
-                  FirestoreMethods().likePost(
-                    widget.snap['postId'],
-                    user.uid,
-                    isLiked,
-                    fromHeart: true,
-                  );
+                  if (!isGuest) {
+                    FirestoreMethods().likePost(
+                      widget.snap['postId'],
+                      user.uid,
+                      isLiked,
+                      fromHeart: true,
+                    );
+                  } else {
+                    showSnackBar('Login required to like', context);
+                  }
                 },
                 padding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
