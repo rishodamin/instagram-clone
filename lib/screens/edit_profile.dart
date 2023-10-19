@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/global_variables.dart';
 import 'package:instagram_clone/utils/utils.dart';
 
 class EditProfile extends StatefulWidget {
@@ -36,6 +37,7 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.sizeOf(context).width;
     _nameController.text = widget.name;
     _bioController.text = widget.bio;
     return Scaffold(
@@ -46,7 +48,8 @@ class _EditProfileState extends State<EditProfile> {
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(
+                horizontal: width > webScreenWidth ? width / 3 : 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

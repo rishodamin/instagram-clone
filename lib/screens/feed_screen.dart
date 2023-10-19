@@ -8,6 +8,7 @@ import 'package:instagram_clone/screens/info_screen.dart';
 import 'package:instagram_clone/screens/login_screen.dart';
 import 'package:instagram_clone/screens/message_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/global_variables.dart';
 import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/post_card.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,7 @@ class FeedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.sizeOf(context).width;
     final bool isGuest = Provider.of<UserProvider>(context).isGuest;
     return Scaffold(
       appBar: AppBar(
@@ -41,11 +43,13 @@ class FeedScreen extends StatelessWidget {
                 ),
               ),
             ),
+          SizedBox(width: width > webScreenWidth ? 100 : 0),
           IconButton(
             onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => const InfoScreen())),
             icon: const Icon(Icons.info_outline),
           ),
+          SizedBox(width: width > webScreenWidth ? 100 : 0),
           IconButton(
             onPressed: () {
               if (!isGuest) {
@@ -58,6 +62,7 @@ class FeedScreen extends StatelessWidget {
             },
             icon: const Icon(Icons.messenger_outline),
           ),
+          SizedBox(width: width > webScreenWidth ? 100 : 0),
         ],
       ),
       body: StreamBuilder(
@@ -73,8 +78,12 @@ class FeedScreen extends StatelessWidget {
           }
           return ListView.builder(
             itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) =>
-                PostCard(snap: snapshot.data!.docs[index].data()),
+            itemBuilder: (context, index) => Padding(
+              padding: width > webScreenWidth
+                  ? EdgeInsets.symmetric(horizontal: width / 3)
+                  : const EdgeInsets.symmetric(horizontal: 0),
+              child: PostCard(snap: snapshot.data!.docs[index].data()),
+            ),
           );
         },
       ),

@@ -8,6 +8,7 @@ import 'package:instagram_clone/screens/chat_screen.dart';
 import 'package:instagram_clone/screens/edit_profile.dart';
 import 'package:instagram_clone/screens/login_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/global_variables.dart';
 import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/follow_button.dart';
 import 'package:provider/provider.dart';
@@ -57,6 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.sizeOf(context).width;
     if (userData == null || postData == null) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -105,7 +107,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(fontSize: 16),
                 ),
               ),
-            )
+            ),
+          SizedBox(width: width > webScreenWidth ? 100 : 0),
         ],
       ),
       body: ListView(
@@ -120,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     CircleAvatar(
                       backgroundColor: Colors.grey,
                       backgroundImage: NetworkImage(userData!['photoUrl']),
-                      radius: 40,
+                      radius: width > webScreenWidth ? 80 : 40,
                     ),
                     Expanded(
                       child: Padding(
@@ -151,8 +154,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const EdgeInsets.only(top: 20, bottom: 4, left: 10),
                       child: Text(
                         userData!['name'],
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 16),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: width > webScreenWidth ? 22 : 16),
                       ),
                     ),
                   ),
@@ -161,7 +165,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     width: 250,
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 10, left: 10),
-                      child: Text(userData!['bio']),
+                      child: Text(
+                        userData!['bio'],
+                        style: TextStyle(
+                            fontSize: width > webScreenWidth ? 18 : 14),
+                      ),
                     ),
                   ),
                 Row(
@@ -244,21 +252,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const Divider(),
-          GridView.builder(
-            shrinkWrap: true,
-            itemCount: postData!.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 5,
-              mainAxisSpacing: 1.5,
-              childAspectRatio: 1,
+          Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: width > webScreenWidth ? width / 4 : 0),
+            child: GridView.builder(
+              shrinkWrap: true,
+              itemCount: postData!.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 5,
+                mainAxisSpacing: 1.5,
+                childAspectRatio: 1,
+              ),
+              itemBuilder: (context, index) {
+                return Image(
+                  image: NetworkImage(postData![index]['postUrl']),
+                  fit: BoxFit.cover,
+                );
+              },
             ),
-            itemBuilder: (context, index) {
-              return Image(
-                image: NetworkImage(postData![index]['postUrl']),
-                fit: BoxFit.cover,
-              );
-            },
           ),
         ],
       ),

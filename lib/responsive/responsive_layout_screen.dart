@@ -33,7 +33,6 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
   @override
   Widget build(BuildContext context) {
-    print(Provider.of<UserProvider>(context).isGuest);
     return (!Provider.of<UserProvider>(context).isGuest &&
             Provider.of<UserProvider>(context).getUser == null)
         ? const Center(

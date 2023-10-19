@@ -38,9 +38,7 @@ class _PostCardState extends State<PostCard> {
       setState(() {
         commentLen = comment.docs.length;
       });
-    } catch (e) {
-      print('something bad happen');
-    }
+    } catch (e) {}
   }
 
   @override

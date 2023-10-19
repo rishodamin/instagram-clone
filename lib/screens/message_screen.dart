@@ -5,6 +5,7 @@ import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/screens/chat_screen.dart';
 import 'package:instagram_clone/screens/search_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/global_variables.dart';
 import 'package:provider/provider.dart';
 
 class MessageScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class MessageScreen extends StatefulWidget {
 class _ChatScreenState extends State<MessageScreen> {
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.sizeOf(context).width;
     User user = Provider.of<UserProvider>(context).getUser!;
     return Scaffold(
       appBar: AppBar(
@@ -30,7 +32,8 @@ class _ChatScreenState extends State<MessageScreen> {
         backgroundColor: mobileBackgroundColor,
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 32),
+        padding: EdgeInsets.symmetric(
+            horizontal: width > webScreenWidth ? width / 3 : 21, vertical: 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -8,6 +8,7 @@ import 'package:instagram_clone/responsive/responsive_layout_screen.dart';
 import 'package:instagram_clone/responsive/web_screen_layout.dart';
 import 'package:instagram_clone/screens/login_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/global_variables.dart';
 import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
 
@@ -97,6 +98,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.sizeOf(context).width;
     return _image == null
         ? const Center(
             child: CircularProgressIndicator(),
@@ -104,7 +106,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         : Scaffold(
             body: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
+                padding: width > webScreenWidth
+                    ? EdgeInsets.symmetric(horizontal: width / 3)
+                    : const EdgeInsets.symmetric(horizontal: 32),
                 child: Center(
                   child: SingleChildScrollView(
                     child: Column(

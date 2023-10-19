@@ -31,20 +31,25 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.sizeOf(context).width;
     User myId = Provider.of<UserProvider>(context).getUser!;
     return Scaffold(
       appBar: AppBar(
         title: ListTile(
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage(widget.dudePic),
-            radius: 20,
+          leading: Padding(
+            padding:
+                EdgeInsets.only(left: width > webScreenWidth ? width / 3 : 0),
+            child: CircleAvatar(
+              backgroundImage: NetworkImage(widget.dudePic),
+              radius: 20,
+            ),
           ),
           title: Text(
             widget.dudeName,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
           ),
           horizontalTitleGap: 14,
-          contentPadding: EdgeInsets.all(0),
+          contentPadding: const EdgeInsets.all(0),
         ),
         backgroundColor: mobileBackgroundColor,
       ),
@@ -52,7 +57,10 @@ class _ChatScreenState extends State<ChatScreen> {
         margin: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        padding: const EdgeInsets.only(left: 16, right: 8),
+        padding: EdgeInsets.only(
+          left: 16 + (width > webScreenWidth ? width / 3 : 0),
+          right: 8 + (width > webScreenWidth ? width / 3 : 0),
+        ),
         child: Row(
           children: [
             Expanded(
@@ -61,7 +69,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: TextField(
                   controller: messageController,
                   maxLines: null,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Message...',
                     border: InputBorder.none,
                   ),
@@ -102,34 +110,38 @@ class _ChatScreenState extends State<ChatScreen> {
           }
           List<QueryDocumentSnapshot<Map<String, dynamic>>> data =
               snapshot.data!.docs;
-          return ListView.builder(
-            reverse: true,
-            itemCount: data.length,
-            itemBuilder: (context, index) {
-              Map<String, dynamic> message = data[index].data();
-              return Row(
-                mainAxisAlignment: message['sender'] == myId.username
-                    ? MainAxisAlignment.end
-                    : MainAxisAlignment.start,
-                children: [
-                  Container(
-                    margin: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(28),
-                      color: message['sender'] == myId.username
-                          ? Colors.purple
-                          : const Color.fromRGBO(40, 40, 40, 1),
+          return Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: width > webScreenWidth ? width / 3 : 0),
+            child: ListView.builder(
+              reverse: true,
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                Map<String, dynamic> message = data[index].data();
+                return Row(
+                  mainAxisAlignment: message['sender'] == myId.username
+                      ? MainAxisAlignment.end
+                      : MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(28),
+                        color: message['sender'] == myId.username
+                            ? Colors.purple
+                            : const Color.fromRGBO(40, 40, 40, 1),
+                      ),
+                      constraints: const BoxConstraints(maxWidth: 220),
+                      padding: const EdgeInsets.all(12),
+                      child: Text(
+                        message['message'],
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ),
-                    constraints: const BoxConstraints(maxWidth: 220),
-                    padding: const EdgeInsets.all(12),
-                    child: Text(
-                      message['message'],
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ],
-              );
-            },
+                  ],
+                );
+              },
+            ),
           );
         },
       ),

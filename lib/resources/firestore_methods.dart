@@ -57,9 +57,7 @@ class FirestoreMethods {
           'likes': FieldValue.arrayUnion([uid])
         });
       }
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
 
   Future<void> postComment(String postId, String text, String uid, String name,
@@ -81,12 +79,8 @@ class FirestoreMethods {
           'datePublished': DateTime.now(),
           'likes': [],
         });
-      } else {
-        print('text is empty');
       }
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
 
   Future<void> likeComment(
@@ -111,9 +105,7 @@ class FirestoreMethods {
           'likes': FieldValue.arrayUnion([uid])
         });
       }
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
 
   // delete post
@@ -121,9 +113,7 @@ class FirestoreMethods {
     try {
       _firestore.collection('posts').doc(postId).delete();
       StorageMethods().deletePost(storageId);
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
 
   //follow user
@@ -150,9 +140,7 @@ class FirestoreMethods {
           'following': FieldValue.arrayUnion([followId])
         });
       }
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
 
   Future<void> sendMessage(

@@ -105,6 +105,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.sizeOf(context).width;
     final model.User user = Provider.of<UserProvider>(context).getUser!;
     String photoUrl = user.photoUrl;
     return _file == null
@@ -140,7 +141,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       fontSize: 18,
                     ),
                   ),
-                )
+                ),
+                SizedBox(width: width > webScreenWidth ? 100 : 0),
               ],
             ),
             body: Column(
@@ -153,22 +155,24 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   children: [
                     CircleAvatar(
                       backgroundImage: NetworkImage(photoUrl),
+                      radius: width > webScreenWidth ? 60 : 20,
                     ),
                     SizedBox(
-                      width: MediaQuery.sizeOf(context).width * 0.45,
+                      width: width * 0.45,
                       child: TextField(
                         controller: _captionController,
                         decoration: const InputDecoration(
                           hintText: "Write a caption...",
                           border: InputBorder.none,
                         ),
-                        maxLines: 8,
+                        maxLines: null,
+                        maxLength: 200,
                       ),
                     ),
                     Image(
                       image: MemoryImage(_file!),
-                      width: 45,
-                      height: 45,
+                      width: width > webScreenWidth ? 250 : 45,
+                      height: width > webScreenWidth ? 250 : 45,
                     ),
                     const SizedBox(width: 10),
                   ],

@@ -58,7 +58,6 @@ class MyApp extends StatelessWidget {
               }
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              print('fuck');
               return const Center(
                 child: CircularProgressIndicator(color: primaryColor),
               );
